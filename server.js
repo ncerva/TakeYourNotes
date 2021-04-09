@@ -1,22 +1,20 @@
-const { response } = require('express');
+const express = require('express');
 const http = require('http');
-const fs = require('fs')
-const PORT = 8080;
+const fs = require('fs');
+const path = require("path");
+const PORT = process.env.PORT || 8080;
+const app = express();
+const mainDir = path.join(__dirname, "/public");
 
-// linking
-const handleRequest = (req,res) => {
-    fs.readFile(`${__dirname}/index.html`, (err,data) =>{
-        if (err) throw err;
-        res.writeHead(200, { 'Content-Type': 'text/html' });
-    res.end(data);
-    });
-    fs.readFile(`${__dirname}/notes.html`, (err,data) =>{
-        if (err) throw err;
-        res.writeHead(200, { 'Content-Type': 'text/html' });
-    res.end(data);
-    });
-};
-const server = http.createServer(handleRequest);
-server.listen(PORT, () => {
-    console.log(`server listening on http://localhost:${PORT}`);
+app.use(express.static('public'));
+app.use(express.urlencoded({extended: true}));
+app.use(express.json());
+
+app.get("/api/notes/:id", function(req, res) {
+    const savedNotes = JSON.parse(fs.readFileSync("./db/db.json", "utf8"));
+    res.json(savedNotes[Number(req.params.id)]);
 });
+
+app.listen(PORT, function() {
+    console.log(`http://localhost:${PORT}`);
+})
