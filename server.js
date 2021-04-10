@@ -1,5 +1,4 @@
 const express = require('express');
-const http = require('http');
 const fs = require('fs');
 const path = require("path");
 const PORT = process.env.PORT || 8080;
@@ -13,6 +12,9 @@ app.use(express.json());
 app.get("/api/notes/:id", function(req, res) {
     const savedNotes = JSON.parse(fs.readFileSync("./db/db.json", "utf8"));
     res.json(savedNotes[Number(req.params.id)]);
+});
+app.get("/notes", function(req,res){
+    res.sendFile(path.join(mainDir, "notes.html"));
 });
 
 app.listen(PORT, function() {
